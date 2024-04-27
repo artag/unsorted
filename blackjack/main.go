@@ -25,8 +25,8 @@ func main() {
 	console := NewConsole(out)
 
 	money := NewMoney(out, InitialMoney)
-	dealerHand := NewHand("DEALER")
-	playerHand := NewHand("PLAYER")
+	dealerHand := NewHand(out, "DEALER")
+	playerHand := NewHand(out, "PLAYER")
 
 	displayWelcomeMessage(out)
 
@@ -164,8 +164,8 @@ func displayWelcomeMessage(out io.Writer) {
 }
 
 func displayHands(playerHand, dealerHand Hand, hideDealerHand bool) {
-	dealerHand.Display(out, hideDealerHand)
-	playerHand.Display(out, false)
+	dealerHand.Display(hideDealerHand)
+	playerHand.Display(false)
 	fmt.Fprintln(out)
 }
 

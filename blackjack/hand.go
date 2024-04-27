@@ -6,12 +6,16 @@ import (
 )
 
 type Hand struct {
+	out   io.Writer
 	cards Cards
 	name  string
 }
 
-func NewHand(name string) *Hand {
-	return &Hand{name: name, cards: make(Cards, 0)}
+func NewHand(out io.Writer, name string) *Hand {
+	return &Hand{
+		name:  name,
+		cards: make(Cards, 0),
+		out:   out}
 }
 
 func (h *Hand) Get(card Card) {
@@ -28,12 +32,12 @@ func (h *Hand) Put() *Card {
 	return &card
 }
 
-func (h *Hand) Display(out io.Writer, hideFirstCard bool) {
+func (h *Hand) Display(hideFirstCard bool) {
 	if hideFirstCard {
-		fmt.Fprintf(out, "%s: ???\n", h.name)
+		fmt.Fprintf(h.out, "%s: ???\n", h.name)
 	} else {
 		value := h.cards.GetValue()
-		fmt.Fprintf(out, "%s: %d\n", h.name, value)
+		fmt.Fprintf(h.out, "%s: %d\n", h.name, value)
 	}
 
 	for i := range h.cards {
@@ -44,8 +48,8 @@ func (h *Hand) Display(out io.Writer, hideFirstCard bool) {
 		}
 	}
 
-	h.cards.Display(out)
-	fmt.Fprintln(out)
+	h.cards.Display(h.out)
+	fmt.Fprintln(h.out)
 }
 
 func (h *Hand) CanDoubleDown(money int) bool {
