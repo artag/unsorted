@@ -42,7 +42,7 @@ func playGame(dealer *c.Dealer, dices *c.Dices, player *c.Player) error {
 			return err
 		}
 
-		msg := fmt.Sprintf("You have %d mon. How much do you bet?", player.GetMoney())
+		msg := fmt.Sprintf("You have %d mon. How much do you bet? (or (Q)UIT)", player.GetMoney())
 		bet, quit := input.EnterBetOrQuit(msg, dealer, player)
 		if quit {
 			msg := fmt.Sprintf("You live the game with %d mon.", player.GetMoney())
