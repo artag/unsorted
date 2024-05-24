@@ -1,12 +1,15 @@
 package sevseg
 
 import (
+	"errors"
 	"fmt"
 	"strings"
 )
 
 var (
 	validSymbols = map[rune]bool{
+		' ': true,
+		':': true,
 		'-': true,
 		'.': true,
 		'0': true,
@@ -22,14 +25,54 @@ var (
 	}
 )
 
-func GetSevSegStr(number string, minWidth ...int) (string, error) {
-	if err := checkNumber(number); err != nil {
+func GetSegmentsInRow(numbers []string, minWidth int) (string, error) {
+	if err := checkNumbers(numbers); err != nil {
 		return "", err
 	}
 
-	num := getZeroPaddedNumber(number, minWidth)
-	str := getNumberAsSegment(num)
+	for _, number := range numbers {
+		if err := checkNumber(number); err != nil {
+			return "", err
+		}
+	}
+
+	var sb strings.Builder
+	for _, number := range numbers {
+		num := getZeroPaddedNumber(number, minWidth)
+		sb.WriteString(num)
+	}
+
+	str := getNumberAsSegment(sb.String())
 	return str, nil
+}
+
+func GetSegmentsInRows(numbers []string, minWidth int) ([]string, error) {
+	if err := checkNumbers(numbers); err != nil {
+		return make([]string, 0), err
+	}
+
+	for _, number := range numbers {
+		if err := checkNumber(number); err != nil {
+			return make([]string, 0), err
+		}
+	}
+
+	var sb strings.Builder
+	for _, number := range numbers {
+		num := getZeroPaddedNumber(number, minWidth)
+		sb.WriteString(num)
+	}
+
+	rows := getNumberAsSegmentAsRows(sb.String())
+	return rows, nil
+}
+
+func checkNumbers(numbers []string) error {
+	if len(numbers) < 1 {
+		return errors.New("input numbers must not be empty")
+	}
+
+	return nil
 }
 
 func checkNumber(number string) error {
@@ -43,7 +86,11 @@ func checkNumber(number string) error {
 	return nil
 }
 
-func getZeroPaddedNumber(number string, mw []int) string {
+func getZeroPaddedNumber(number string, mw int) string {
+	if number == " " || number == ":" || number == "-" || number == "." {
+		return number
+	}
+
 	minWidth := getMinWidthParam(mw)
 	length := getMaxInt(len(number), minWidth)
 
@@ -57,18 +104,13 @@ func getZeroPaddedNumber(number string, mw []int) string {
 	return num
 }
 
-func getMinWidthParam(minWidth []int) int {
+func getMinWidthParam(minWidth int) int {
 	var mw int
 
-	if len(minWidth) < 1 {
+	if minWidth < 0 {
 		mw = 0
 	} else {
-		param := minWidth[0]
-		if param < 0 {
-			mw = 0
-		} else {
-			mw = param
-		}
+		mw = minWidth
 	}
 
 	return mw
@@ -83,12 +125,30 @@ func getMaxInt(num1, num2 int) int {
 }
 
 func getNumberAsSegment(num string) string {
+	rows := getNumberAsSegmentAsRows(num)
+	var sb strings.Builder
+	for _, row := range rows {
+		sb.WriteString(row)
+	}
+
+	return sb.String()
+}
+
+func getNumberAsSegmentAsRows(num string) []string {
 	var row0 strings.Builder
 	var row1 strings.Builder
 	var row2 strings.Builder
 	for i := 0; i < len(num); i++ {
 		n := num[i]
 		switch n {
+		case ' ':
+			row0.WriteString("   ")
+			row1.WriteString("   ")
+			row2.WriteString("   ")
+		case ':':
+			row0.WriteString("   ")
+			row1.WriteString(" * ")
+			row2.WriteString(" * ")
 		case '.':
 			row0.WriteString(" ")
 			row1.WriteString(" ")
@@ -152,6 +212,5 @@ func getNumberAsSegment(num string) string {
 		}
 	}
 
-	str := row0.String() + row1.String() + row2.String()
-	return str
+	return []string{row0.String(), row1.String(), row2.String()}
 }
