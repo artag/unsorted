@@ -68,6 +68,8 @@ func main() {
 		}
 	}
 
+	termbox.Clear(termbox.ColorDefault, termbox.ColorDefault)
+	termbox.Flush()
 	termbox.Close()
 
 	if timeEnd {
@@ -82,6 +84,7 @@ func bgthread(summarySeconds int) {
 	separator := ":"
 	ticker := time.NewTicker(CountDelayInMs * time.Millisecond)
 	defer ticker.Stop()
+
 	for {
 		termbox.Clear(termbox.ColorDefault, termbox.ColorDefault)
 
@@ -92,9 +95,15 @@ func bgthread(summarySeconds int) {
 			os.Exit(1)
 		}
 
-		tbprint(1, 1, termbox.ColorDefault, termbox.ColorDefault, segments[0])
-		tbprint(1, 2, termbox.ColorDefault, termbox.ColorDefault, segments[1])
-		tbprint(1, 3, termbox.ColorDefault, termbox.ColorDefault, segments[2])
+		// Remove '\n'
+		rows := make([]string, 3)
+		for i := range segments {
+			rows[i] = strings.TrimSuffix(segments[i], "\n")
+		}
+
+		tbprint(1, 1, termbox.ColorDefault, termbox.ColorDefault, rows[0])
+		tbprint(1, 2, termbox.ColorDefault, termbox.ColorDefault, rows[1])
+		tbprint(1, 3, termbox.ColorDefault, termbox.ColorDefault, rows[2])
 		tbprint(1, 5, termbox.ColorDefault, termbox.ColorDefault, "Press 'Ctrl-C' to quit.")
 		termbox.Flush()
 		<-ticker.C // wait for ticker
