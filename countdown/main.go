@@ -22,7 +22,7 @@ import (
 )
 
 const (
-	DirectoryWithSounds = "signals"
+	DirectoryWithSounds = "sounds"
 	SoundExtension      = ".mp3"
 	SecondsInHour       = 3600
 	SecondsInMinute     = 60
